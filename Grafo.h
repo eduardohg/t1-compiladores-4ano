@@ -20,6 +20,12 @@ Lista getVertices(Grafo gra);
 /*Retorna a lista de todos os vertices do grafo
 */
 
+void setKColor(Grafo gra, int k);
+
+int getKColor(Grafo gra);
+
+int getValid(Grafo gra, Vertice v);
+
 Grafo criaGrafo(int colors,int id);
 /*Cria um grafo com numero de nos = colors, ou seja
   o numero maximo de cores aceitas
@@ -34,7 +40,7 @@ int getIdGrafo(Grafo gra);
 Retorna o seu id;
 */
 
-int addVertice(Grafo gra, int a);
+int addVertice(Grafo gra, int a, int verify);
 /*Adiciona o vertice a ao grafo.
 Se conseguir inserir, retorna 1
 Caso ja exista um vertice com o mesmo id, retorna 0
@@ -104,6 +110,15 @@ int existeVerticeValido(Grafo gra);
  * retorna 0.
  */
 
+int existeVerticeValidoMenorGrau(Grafo gra);
+/*
+ * Se existe ao menos 1 vertice valido no grafo e seu grau é menor que K
+ * retorna 1.
+ * Caso contrario
+ * retorna 0.
+ */
+
+void setaValid(Grafo gra);
 
 
 int pintaVertice(Grafo gra, Vertice v, int color);

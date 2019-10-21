@@ -16,6 +16,7 @@ typedef struct _vertice{
 
 typedef struct _grafo{
   int k;
+  int kColor;
   int id;
   Lista vertices;
 }grafo;
@@ -24,6 +25,23 @@ Lista getVertices(Grafo gra){
   grafo *g = (grafo*) gra;
 
   return g->vertices;
+}
+
+void setKColor(Grafo gra, int k){
+  grafo *g = (grafo*)gra;
+  g->kColor = k;
+}
+
+int getKColor(Grafo gra){
+  grafo *g = (grafo*)gra;
+  return g->kColor;
+}
+
+int getValid(Grafo gra, Vertice v){
+  grafo *g = (grafo*)gra;
+  vertice *vAux = (vertice*)v;
+
+  return vAux->valid;
 }
 
 Grafo criaGrafo(int colors, int id){
@@ -58,17 +76,26 @@ int getIdGrafo(Grafo gra){
   return g->id;
 }
 
-int addVertice(Grafo gra, int a){
+int addVertice(Grafo gra, int a, int verify){
+  Posic item;
   grafo *g = (grafo*) gra;
-  vertice *v = NULL;
+  vertice *v = NULL, *vAux = NULL;
 
   if(verificaVerticeExistencia(gra,a)){
     v = (vertice*)buscaVertice(gra,a);
+    if(verify){
+      item = getFirst(v->arestas);
+      while(item != NULL){
+        vAux = (vertice*)get(v->arestas, item);
+        vAux->grau++;
+        item = getNext(v->arestas,item);
+      }
+    }
+    
     v->valid = 1;
     return 0;
   }
 
-  printf("B");
   v = (vertice*) malloc(sizeof(vertice));
 
   v->arestas = createList();
@@ -301,6 +328,19 @@ int getSizeGrafo(Grafo gra){
   return cont;
 }
 
+void setaValid(Grafo gra){
+  grafo *g = (grafo*) gra;
+  vertice *v = NULL;
+  Posic item;
+
+  item = getFirst(g->vertices);
+  while(item != NULL){
+    v = (vertice*) get(g->vertices, item);
+    v->valid = 1;
+    item = getNext(g->vertices, item);
+  }
+}
+
 int getKGrafo(Grafo gra){
 	grafo *g = (grafo*) gra;
 	return g->k;
@@ -310,6 +350,16 @@ int verificaVerticeValido(Grafo gra, Vertice vert){
 	vertice *v = (vertice*) vert;
 
 	return v->valid;
+}
+
+int verificaVerticeValidoEMenorGrau(Grafo gra, Vertice vert){
+  vertice *v = (vertice*) vert;
+
+  if(v->valid && v->grau < getKColor(gra))
+    return 1;
+
+  else
+    return 0;
 }
 
 int existeVerticeValido(Grafo gra){
@@ -331,6 +381,22 @@ int existeVerticeValido(Grafo gra){
 
 }
 
+int existeVerticeValidoMenorGrau(Grafo gra){
+  grafo *g = (grafo*)gra;
+  vertice *v = NULL;
+  Posic item;
+  item = getFirst(g->vertices);
+  while (item != NULL)
+  {
+    v = (vertice*) get(g->vertices, item);
+    if(v->valid && v->id > getKGrafo(g)){
+      return 1;
+    }
+    item = getNext(g->vertices, item);
+  }
+  return 0;
+}
+
 
 
 int verificaCoresVertice(Grafo gra, Vertice vert){
@@ -339,7 +405,7 @@ int verificaCoresVertice(Grafo gra, Vertice vert){
   vertice *v = (vertice*) vert, *vAux = NULL;
   Posic item;
 
-  k = g->k;
+  k = g->kColor;
   disp = (int*) malloc(sizeof(int)*k);
   //Seta todos como disponiveis
   for(i = 0; i < k; i++)
@@ -373,7 +439,7 @@ int pintaVertice(Grafo gra, Vertice vert, int color){
 	grafo *g = (grafo*) gra;
   vertice *v = (vertice*) vert;
 
-  if(!v->valid || color >= g->k)
+  if(!v->valid || color >= g->kColor)
     return -1;
 
   v->color = color;
@@ -398,43 +464,27 @@ Vertice getVerticeMenorGrau(Grafo gra){
   grafo *g = (grafo*)gra;
   Lista vertices;
   Posic item;
-  vertice *v,*vAux;
-  int num,menorGrau;
+  vertice *v,*vAux=NULL;
+  int num,menorGrau=10000000;
   vertices = g->vertices;
 
   item = getFirst(g->vertices);
-  v = (vertice*) get(g->vertices,item);
-  menorGrau = v->grau;
-  vAux = v;
-  item = getNext(g->vertices, item);
 
   while(item != NULL){
     v = (vertice*) get(g->vertices,item);
-    if(v->valid){
-      if(v->grau < g->k){
-        if(v->grau < menorGrau){
-          vAux = v;
-          menorGrau = v->grau;
-        }
-        if(v->grau == menorGrau){
-          if(v->id < vAux->id){
-            vAux = v;
-            menorGrau = v->grau;
-          }
-        }
+    if(getIdVertice(g, v) > getKGrafo(g) && verificaVerticeValidoEMenorGrau(g, v)){
+      if(v->grau < menorGrau){
+        menorGrau = v->grau;
+        vAux = (vertice*)get(g->vertices, item);
+      }
+      else if(v->grau == menorGrau){
+        if(getIdVertice(g, v) < getIdVertice(g, vAux))
+          vAux = (vertice*)get(g->vertices, item); 
       }
     }
-    
     item = getNext(g->vertices, item);
   }
-  if(vAux->valid && menorGrau < g->k){
-    printf("V");
-    vAux->valid = 0;
-    return vAux;
-  }
-  else
-    return NULL;
-
+  return vAux;
 }
 /*
  * Codigo antes de mudar o removeEdgeint *n = NULL;

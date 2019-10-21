@@ -61,7 +61,7 @@ Lista list;
   registradores: K ASSIGN NUM END_LINE{registers = $3; graph = criaGrafo(registers,id);}
   ;
 
-  declaracoes: NUM EDGE declaracoes2 {vertex = $1; addVertice(graph,vertex); adicionaVertices(graph,vertex,list); liberaLista(list);}
+  declaracoes: NUM EDGE declaracoes2 {vertex = $1; addVertice(graph,vertex, 0); adicionaVertices(graph,vertex,list); liberaLista(list);}
   ;
 
   declaracoes2: NUM declaracoes2  {int *n = (int *)malloc(sizeof(int)); *n=$1; insert(list,n);}
@@ -77,7 +77,7 @@ void adicionaVertices(Grafo graph,int vertex,Lista lista){
   int *n;
   while (item != NULL) {
     n = (int *)get(lista,item);
-    addVertice(graph,*n);
+    addVertice(graph,*n, 0);
     addAresta(graph,vertex,*n);
     item = getPrevious(lista,item);
   }
