@@ -233,7 +233,6 @@ void removeVertice(Grafo gra, Vertice a){
 
   g = (grafo*) gra;
   v = (vertice*) a;
-
   item = getFirst(v->arestas);
 
   while(item != NULL){
@@ -243,7 +242,6 @@ void removeVertice(Grafo gra, Vertice a){
   }
 
   v->valid = 0;
-
 }
 
 int imprimeGrafo(Grafo gra){
@@ -456,7 +454,6 @@ int getColorVertice(Grafo gra, Vertice vert){
 
 int getIdVertice(Grafo gra, Vertice vert){
   vertice *v = (vertice*) vert;
-
   return v->id;
 }
 
@@ -465,7 +462,7 @@ Vertice getVerticeMenorGrau(Grafo gra){
   Lista vertices;
   Posic item;
   vertice *v,*vAux=NULL;
-  int num,menorGrau=10000000;
+  int num,menorGrau=100000000;
   vertices = g->vertices;
 
   item = getFirst(g->vertices);

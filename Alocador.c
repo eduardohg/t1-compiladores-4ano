@@ -59,8 +59,6 @@ int alocar(Grafo grafo){
 		if(kOriginal!=1)
 			printf("\n");
 	}
-	
-	
 }
 
 Vertice potencialSpill(Grafo grafo);
@@ -92,7 +90,6 @@ Pilha simplify(Grafo gra){
 			removeu = 1;
 		}
 	}
-
 	// printf("TAMANHO DA PILHA NO SIMPLIFY: %d\n", getSizePilha(pilha));
 	return pilha;
 }
@@ -101,24 +98,42 @@ Pilha simplify(Grafo gra){
 Vertice potencialSpill(Grafo gra){
 	int i, maior;
 	Grafo g = (Grafo*)gra;
-	Vertice vertice, aux;
+	Vertice vertice=NULL, aux;
 	Lista vList;
 	Posic item;
 	vList = getVertices(gra);
-	vertice = getFirst(vList);
 	item = getFirst(vList);
-	maior = getGrauVertice(gra,get(vList, item));
+	aux = get(vList, item);
 
 	while(item != NULL){
-		aux = get(vList,item);
-		if(getGrauVertice(gra,aux) > maior && getIdVertice(gra, aux) > getKGrafo(gra) && getValid(gra, aux)){
-			maior = getGrauVertice(gra,aux);
-			vertice = aux;
+		if(getIdVertice(gra, aux) > getKGrafo(g) && getValid(g, aux)){
+			break;
 		}
-		item = getNext(vList,item);
+		item = getNext(vList, item);
+		aux = get(vList, item);
 	}
+	if(item != NULL){
+		maior = getGrauVertice(gra,aux);
+		vertice = aux;
+		item = getNext(vList, item);
 
-	return vertice;
+		while(item != NULL){
+			aux = get(vList,item);
+			if(getGrauVertice(gra,aux) >= maior && getIdVertice(gra, aux) > getKGrafo(gra) && getValid(gra, aux)){
+				if(getGrauVertice(gra, aux) == maior && getIdVertice(gra, aux) < getIdVertice(gra, vertice)){
+					maior = getGrauVertice(gra,aux);
+					vertice = aux;
+				}
+				else if(getGrauVertice(gra, aux) != maior){
+					maior = getGrauVertice(gra,aux);
+					vertice = aux;
+				}
+			}
+			item = getNext(vList,item);
+		}
+		return vertice;
+	}
+	return NULL;
 }
 
 int assign(Grafo grafo, Pilha pilha){
